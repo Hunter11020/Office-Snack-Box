@@ -22,8 +22,11 @@ export default function SnackFormDialog({ open, snack, onClose, onSuccess }: Pro
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Sync the selected snack (or blank defaults) into the form fields whenever the
+  // dialog opens or the target changes — the canonical controlled-form reset pattern.
   useEffect(() => {
     if (snack) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(snack.name)
       setDescription(snack.description ?? '')
       setQuantity(String(snack.quantity))
@@ -54,8 +57,8 @@ export default function SnackFormDialog({ open, snack, onClose, onSuccess }: Pro
       if (!res.ok) throw new Error(await res.text())
       onSuccess()
       onClose()
-    } catch (e: any) {
-      setError(e.message ?? 'เกิดข้อผิดพลาด')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     } finally {
       setLoading(false)
     }

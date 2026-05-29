@@ -47,13 +47,16 @@ export default function HomePage() {
       setUpdatedAt(
         new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
       )
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     } finally {
       setLoading(false)
     }
   }, [])
 
+  // Fetch-on-mount: loading starts true and error starts empty, so the initial
+  // setState calls are no-ops (React bails out on identical values) — no real cascade.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchSnacks() }, [fetchSnacks])
 
   const stats = useMemo(() => {

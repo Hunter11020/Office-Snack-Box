@@ -25,18 +25,19 @@ export default function AdminPage() {
   const [editTarget, setEditTarget] = useState<Snack | null>(null)
 
   const fetchSnacks = useCallback(async () => {
-    setLoading(true)
     try {
       const res = await fetch('/api/snacks')
       if (!res.ok) throw new Error('โหลดข้อมูลไม่สำเร็จ')
       setSnacks(await res.json())
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     } finally {
       setLoading(false)
     }
   }, [])
 
+  // Fetch-on-mount: fetchSnacks only calls setState after an await, so no synchronous cascade.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchSnacks() }, [fetchSnacks])
 
   const handleDelete = async (id: number) => {
@@ -45,8 +46,8 @@ export default function AdminPage() {
       const res = await fetch(`/api/snacks/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('ลบไม่สำเร็จ')
       fetchSnacks()
-    } catch (e: any) {
-      alert(e.message)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     }
   }
 
@@ -59,8 +60,8 @@ export default function AdminPage() {
       })
       if (!res.ok) throw new Error('อัปเดตไม่สำเร็จ')
       fetchSnacks()
-    } catch (e: any) {
-      alert(e.message)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     }
   }
 
@@ -100,7 +101,7 @@ export default function AdminPage() {
               {snacks.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                    ยังไม่มีขนม กด "เพิ่มขนม" เพื่อเริ่มต้น
+                    ยังไม่มีขนม กด &quot;เพิ่มขนม&quot; เพื่อเริ่มต้น
                   </TableCell>
                 </TableRow>
               )}

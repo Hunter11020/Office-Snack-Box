@@ -38,8 +38,8 @@ export default function WithdrawDialog({ snack, open, onClose, onSuccess }: Prop
       if (!res.ok) throw new Error(await res.text())
       onSuccess()
       handleClose()
-    } catch (e: any) {
-      setError(e.message ?? 'เกิดข้อผิดพลาด')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาด')
     } finally {
       setLoading(false)
     }
