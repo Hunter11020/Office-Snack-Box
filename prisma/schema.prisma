@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model Snack {
+  id                Int             @id @default(autoincrement())
+  name              String
+  description       String?
+  quantity          Int             @default(0)
+  lowStockThreshold Int             @default(5) @map("low_stock_threshold")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  withdrawals       WithdrawalLog[]
+
+  @@map("snacks")
+}
+
+model WithdrawalLog {
+  id          Int      @id @default(autoincrement())
+  snackId     Int?     @map("snack_id")
+  snack       Snack?   @relation(fields: [snackId], references: [id], onDelete: SetNull)
+  withdrawnBy String   @map("withdrawn_by")
+  quantity    Int
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("withdrawal_logs")
+}
