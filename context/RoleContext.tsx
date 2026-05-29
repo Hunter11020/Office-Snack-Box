@@ -14,8 +14,11 @@ const RoleContext = createContext<RoleContextValue>({ role: 'user', setRole: () 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [role, setRoleState] = useState<Role>('user')
 
+  // Restore the saved role from localStorage on mount — syncing from an external
+  // store is exactly what effects are for; the synchronous setState is intentional.
   useEffect(() => {
     const stored = localStorage.getItem('snackbox-role') as Role | null
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored === 'admin' || stored === 'user') setRoleState(stored)
   }, [])
 
