@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import {
   Typography, Box, Button, Alert, CircularProgress,
   Table, TableHead, TableBody, TableRow, TableCell, TableContainer,
-  Paper, IconButton, Tooltip, TextField, InputAdornment
+  Paper, IconButton, Tooltip, TextField, InputAdornment , MenuItem
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import AddIcon from '@mui/icons-material/Add'
@@ -16,10 +16,12 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { useAuth } from '@/context/AuthContext'
 import SnackFormDialog from '@/components/SnackFormDialog'
 import type { Snack } from '@/components/SnackCard'
+import {SNACK_CATEGORIES} from '@/lib/categories'
 
 export default function AdminPage() {
   const { user } = useAuth()
   const [snacks, setSnacks] = useState<Snack[]>([])
+  const [categoryFilter , setCategoryFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -40,13 +42,10 @@ export default function AdminPage() {
    
   const filteredSnacks = snacks.filter((s) => {
     const q = search.trim().toLowerCase()
-  return(
-    !q ||
-  s.name .toLowerCase().includes(q) ||
-  s.category.toLowerCase().includes(q)
-  )
-
-  })
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q)
+    const matchCategory = categoryFilter === 'all' || s.category === categoryFilter
+    return matchSearch && matchCategory 
+   })
 
 
   // Fetch-on-mount: fetchSnacks only calls setState after an await, so no synchronous cascade.
@@ -95,7 +94,9 @@ export default function AdminPage() {
         </Button>
       </Box>
 
-    <TextField
+    <Box>
+
+    <TextField  // search bar
        placeholder="ค้นหาขนม หรือ ประเภท ขนม"
        value={search}
        onChange={(e)=> setSearch(e.target.value)}
@@ -111,7 +112,22 @@ export default function AdminPage() {
         },
        }}
       />
- 
+      <TextField //dropdown ประเภทขนม
+        select
+        label="ประเภท"
+        value={categoryFilter}
+        onChange={(e) => setCategoryFilter(e.target.value)}
+        size="small"
+        sx={{ mb: 2, width: 180, }}
+      >
+        <MenuItem value="all">ทุกประเภท</MenuItem>
+        {SNACK_CATEGORIES.map((c) =>( 
+          <MenuItem key={c} value={c}>{c}</MenuItem>
+        ))}
+        </TextField>
+
+     </Box>
+
     {loading && <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>}
       {error && <Alert severity="error">{error}</Alert>}
 
